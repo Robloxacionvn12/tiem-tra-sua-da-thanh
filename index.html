@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#171b1d">
+<meta name="description" content="Cà Phê Phố — game quản lý tiệm cà phê Việt Nam">
+<title>Cà Phê Phố</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#151a18;--panel:#222b26;--panel2:#303b34;--cream:#f5d9a6;--muted:#b9c4bc;--accent:#b56b43;--green:#3f7863;--purple:#71618d;--wood:#6f432b}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:13px 14px;color:#fff;background:var(--panel2);font-weight:700;touch-action:manipulation}
+button:active{transform:scale(.985)} button:disabled{opacity:.45;cursor:not-allowed}
+.app{max-width:720px;margin:auto;min-height:100dvh;padding:16px 14px 26px}
+header{text-align:center;padding:10px 0 16px} h1{margin:0;color:var(--cream);letter-spacing:2px;font-size:clamp(28px,7vw,40px)} .sub{color:var(--muted);font-size:12px;letter-spacing:1.5px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}.stat,.card{background:var(--panel);border-radius:14px;padding:13px}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{display:block;margin-top:5px;font-size:clamp(14px,4vw,20px)}
+h2{font-size:17px;color:var(--cream);margin:20px 2px 9px}.order-name{font-size:24px;font-weight:800}.muted{color:var(--muted);line-height:1.45;font-size:14px}
+.primary{width:100%;background:var(--accent);margin-top:10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.drink{text-align:left;min-height:76px}.drink span{display:block;font-size:12px;color:#d4dada;margin-top:5px;font-weight:500}
+.inventory{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ingredient{background:#30393b;padding:10px;border-radius:10px;font-size:14px;display:flex;justify-content:space-between;gap:8px}.low{color:#ffb18d}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.restock{background:var(--green)}.upgrade{background:var(--purple)}
+.status{margin-top:15px;color:var(--cream);min-height:48px;line-height:1.4}.menu-screen{position:fixed;inset:0;z-index:5;background:linear-gradient(160deg,#222b2b,#171b1d 70%);display:flex;align-items:center;justify-content:center;padding:24px}.menu-box{width:min(100%,420px);text-align:center}.cup{font-size:76px;margin:20px}.menu-box p{color:var(--muted);line-height:1.5}.start{background:var(--accent);width:100%;font-size:18px}.secondary{background:var(--panel2);width:100%;margin-top:9px}.hidden{display:none!important}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shop-scene{overflow:hidden;border:1px solid #5b4633;border-radius:18px;background:linear-gradient(#d9c4a1 0 43%,#8a5c3b 43% 48%,#493323 48% 100%);margin:8px 0 18px;box-shadow:0 8px 24px #0005}
+.shop-sign{background:#2d4738;color:#f5d9a6;text-align:center;padding:12px 8px;font-weight:900;letter-spacing:2px;font-size:18px;border-bottom:4px solid #6f432b}
+.shop-window{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:8px;align-items:end;padding:14px 12px 0;min-height:126px}
+.window-pane{height:82px;border:5px solid #f2dfbd;border-bottom:0;border-radius:10px 10px 0 0;background:linear-gradient(135deg,#b7d0c4,#e2e6d0 48%,#8ca99b);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:inset 0 0 0 2px #739184}
+.window-pane.center{height:105px;background:linear-gradient(135deg,#4e6b57,#9cb19a);font-size:42px}
+.counter{height:27px;background:linear-gradient(#9a6746,#65412b);border-top:5px solid #d5ad7a;box-shadow:0 5px 0 #3c291e}
+.scene-caption{padding:9px 12px 11px;color:#f5e7d1;font-size:12px;text-align:center;background:#493323}
+.customer-row{display:flex;align-items:center;gap:12px}.customer-avatar{flex:0 0 82px;width:82px;height:104px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(180deg,#f5e5c7,#d8c29c);border:2px solid #b56b43;overflow:hidden}.customer-avatar svg{width:100%;height:100%;display:block}.customer-meta{font-size:12px;color:#e4c99c;margin-top:3px;font-weight:700}.customer-bubble{flex:1;background:#303b34;border-radius:14px;padding:12px;position:relative}.customer-bubble:before{content:"";position:absolute;left:-7px;top:20px;border-width:7px 8px 7px 0;border-style:solid;border-color:transparent #303b34 transparent transparent}
+.prep-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.prep-step{padding:12px 5px;background:#303b34;font-size:12px;min-height:72px}.prep-step.active{outline:2px solid #f5d9a6;background:#465c4c}.prep-step.done{background:#386e62}.prep-progress{height:8px;background:#111815;border-radius:8px;overflow:hidden;margin:12px 0 4px}.prep-progress span{display:block;height:100%;width:0;background:#d8b47b;transition:width .2s}
+.tiny{padding:8px 11px;font-size:13px}.modal{position:fixed;inset:0;background:#000a;z-index:10;display:flex;align-items:center;justify-content:center;padding:18px}.modalbox{background:var(--panel);padding:20px;border-radius:16px;width:min(100%,400px)}.modalbox h2{margin-top:0}.modalbox button{width:100%;margin-top:8px}
+footer{text-align:center;color:#859092;font-size:11px;padding:20px 0 4px}
+@media(min-width:600px){.app{padding-top:24px}.stats strong{font-size:20px}.inventory{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div id="menu" class="menu-screen">
+ <div class="menu-box">
+  <div class="sub">TIỆM CÀ PHÊ VIỆT</div><h1>CÀ PHÊ PHỐ</h1><div class="cup">☕</div>
+  <p>Tự tay pha những ly cà phê Việt, phục vụ khách và phát triển quán nhỏ thành thương hiệu của riêng bạn.</p>
+  <button class="start" id="startBtn">VÀO TIỆM</button>
+  <button class="secondary" id="resetMenuBtn">Chơi lại từ đầu</button>
+ </div>
+</div>
+<div id="game" class="app hidden">
+ <header><div class="topbar"><button class="tiny" id="homeBtn">⌂ Menu</button><div class="sub">TIỆM CÀ PHÊ VIỆT</div><button class="tiny" id="pauseBtn">Ⅱ Tạm dừng</button></div><h1>CÀ PHÊ PHỐ</h1><div class="sub">BẢN WEB · KHÁCH CHIBI 2D</div></header>
+ <section class="stats">
+  <div class="stat"><small>SỐ DƯ</small><strong id="money">120.000đ</strong></div>
+  <div class="stat"><small>CẤP TIỆM</small><strong id="level">Cấp 1</strong></div>
+  <div class="stat"><small>ĐÃ PHỤC VỤ</small><strong id="served">0</strong></div>
+ </section>
+ <section class="shop-scene" aria-label="Hình ảnh cửa tiệm">
+  <div class="shop-sign">☕ CÀ PHÊ PHỐ · COFFEE HOUSE</div>
+  <div class="shop-window"><div class="window-pane">🪴</div><div class="window-pane center">☕</div><div class="window-pane">🌿</div></div>
+  <div class="counter"></div><div class="scene-caption">Góc phố nhỏ · Cà phê pha bằng cả tâm huyết</div>
+ </section>
+ <h2>KHÁCH ĐANG CHỜ GỌI MÓN</h2>
+ <div class="card customer-row"><div class="customer-avatar" id="customerAvatar" aria-label="Nhân vật khách hàng chibi 2D"></div><div class="customer-bubble"><strong id="customerName">Khách ghé quán</strong><div class="customer-meta" id="customerAge">Khách quen</div><div class="muted" id="customerMood">“Cho mình một ly ngon nhé!”</div><div class="order-name" id="orderName">☕ Cà phê sữa đá</div><p class="muted" id="orderDesc"></p><div class="muted" id="recipe"></div></div></div>
+ <h2>QUẦY PHA CHẾ CỦA BẠN</h2>
+ <div class="card"><p class="muted" id="prepHint">Làm lần lượt từng bước để hoàn thành món khách đã gọi.</p><div class="prep-steps"><button class="prep-step" id="prep1">☕<br>1. Chuẩn bị</button><button class="prep-step" id="prep2">🫗<br>2. Pha chế</button><button class="prep-step" id="prep3">✨<br>3. Hoàn thiện</button></div><div class="prep-progress"><span id="prepProgress"></span></div><button class="primary" id="serveBtn" disabled>🔒 Hoàn thành 3 bước để giao món</button></div>
+ <h2>MENU ĐỒ UỐNG</h2><p class="muted">Món khóa sẽ mở khi tiệm đạt đúng Level yêu cầu.</p><div class="grid" id="menuGrid"></div>
+ <h2>KHO NGUYÊN LIỆU</h2><div class="card"><div class="inventory" id="inventory"></div><div class="actions"><button class="restock" id="restockBtn">📦 Nhập nguyên liệu</button><button class="upgrade" id="upgradeBtn">⬆ Nâng cấp tiệm</button></div></div>
+ <div class="card status" id="status" aria-live="polite">Chào mừng đến với Cà Phê Phố!</div>
+ <footer>Cà Phê Phố · Quản lý quán, đón khách và tự tay pha chế</footer>
+</div>
+<div id="modal" class="modal hidden"><div class="modalbox"><h2 id="modalTitle">Tạm dừng</h2><p class="muted" id="modalText">Game đang tạm dừng.</p><button id="resumeBtn" class="primary">Tiếp tục chơi</button><button id="modalHomeBtn">Về menu chính</button></div></div>
+<script>
+const drinks={
+ "Cà phê sữa đá":{price:25000,unlock:1,recipe:{"Cà phê":1,"Sữa đặc":1,"Đá viên":1},desc:"Cà phê phin, sữa đặc và đá viên."},
+ "Cà phê muối":{price:35000,unlock:1,recipe:{"Cà phê":1,"Kem muối":1,"Đá viên":1},desc:"Cà phê đậm vị, phủ lớp kem muối béo mặn."},
+ "Bạc xỉu":{price:28000,unlock:1,recipe:{"Cà phê":1,"Sữa tươi":2,"Sữa đặc":1,"Đá viên":1},desc:"Nhiều sữa, một chút cà phê."},
+ "Cà phê phin đen":{price:20000,unlock:1,recipe:{"Cà phê":1,"Nước lọc":1},desc:"Cà phê phin truyền thống, đậm đà."},
+ "Matcha Latte":{price:39000,unlock:5,recipe:{"Matcha":1,"Sữa tươi":2,"Đá viên":1},desc:"Matcha thơm dịu kết hợp sữa tươi."},
+ "Matcha khoai môn":{price:42000,unlock:6,recipe:{"Matcha":1,"Khoai môn":1,"Sữa tươi":1,"Đá viên":1},desc:"Matcha xanh thơm kết hợp khoai môn béo bùi."},
+ "Soda Chanh":{price:30000,unlock:7,recipe:{"Soda":1,"Chanh":1,"Đá viên":1},desc:"Soda chanh mát lạnh, chua ngọt sảng khoái."},
+ "Soda Việt Quất":{price:35000,unlock:8,recipe:{"Soda":1,"Syrup việt quất":1,"Đá viên":1},desc:"Soda sủi bọt với syrup việt quất."},
+ "Pepsi":{price:22000,unlock:10,recipe:{"Pepsi":1,"Đá viên":1},desc:"Pepsi ướp lạnh dùng kèm đá viên."},
+ "Coca":{price:22000,unlock:12,recipe:{"Coca":1,"Đá viên":1},desc:"Coca-Cola mát lạnh dùng kèm đá viên."},
+ "Cà phê kem trứng nướng":{price:45000,unlock:15,recipe:{"Cà phê":1,"Kem trứng":1},desc:"Cà phê đậm vị phủ kem trứng nướng thơm béo."}
+};
+const costs={"Cà phê":8000,"Sữa đặc":6000,"Sữa tươi":7000,"Kem muối":9000,"Đá viên":2000,"Nước lọc":1000,"Matcha":9000,"Khoai môn":8000,"Soda":5000,"Chanh":3000,"Syrup việt quất":7000,"Pepsi":9000,"Coca":9000,"Kem trứng":10000};
+const initial={money:120000,level:1,served:0,inventory:{"Cà phê":8,"Sữa đặc":8,"Sữa tươi":8,"Kem muối":5,"Đá viên":12,"Nước lọc":10,"Matcha":0,"Khoai môn":0,"Soda":0,"Chanh":0,"Syrup việt quất":0,"Pepsi":0,"Coca":0,"Kem trứng":0},order:"Cà phê sữa đá"};
+let state=loadState(), paused=false, prepStep=0;
+const customers=[
+ {name:"Chú Ba",age:45,gender:"m",hair:"#38302c",skin:"#efc39d",shirt:"#78856b",style:"short",mustache:true,mood:"“Cho chú một cà phê đen nhé!”"},
+ {name:"Cô Lan",age:32,gender:"f",hair:"#332b2b",skin:"#f2c9a8",shirt:"#98739c",style:"bun",mood:"“Cho cô một trà sữa ít đường nha.”"},
+ {name:"Bà Hạnh",age:58,gender:"f",hair:"#aaa19a",skin:"#e8bd9b",shirt:"#a96f72",style:"bun",glasses:true,mood:"“Cho cô trà đào nhé con.”"},
+ {name:"Anh Tuấn",age:35,gender:"m",hair:"#352a26",skin:"#edc09a",shirt:"#536d86",style:"short",glasses:true,mood:"“Một bạc xỉu, ít đá em ơi.”"},
+ {name:"Chị Mai",age:38,gender:"f",hair:"#302623",skin:"#f1c8a9",shirt:"#e3c8a5",style:"long",mood:"“Cho chị matcha latte nhé!”"},
+ {name:"Ông Tâm",age:60,gender:"m",hair:"#aaa39c",skin:"#e4b995",shirt:"#7d7669",style:"side",glasses:true,mustache:true,mood:"“Cho chú cà phê sữa nóng nhé.”"},
+ {name:"Cô Thảo",age:42,gender:"f",hair:"#4b342c",skin:"#f0c5a4",shirt:"#729a91",style:"ponytail",mood:"“Một trà vải ít ngọt nha.”"},
+ {name:"Chú Minh",age:48,gender:"m",hair:"#292625",skin:"#dca983",shirt:"#4e6e84",style:"cap",mustache:true,mood:"“Cho chú bạc xỉu đá nhé!”"},
+ {name:"Cô Tuyết",age:55,gender:"f",hair:"#aaa19a",skin:"#f0c7a8",shirt:"#bd7e83",style:"bun",glasses:true,mood:"“Cho cô ly cà phê sữa đá.”"},
+ {name:"Anh Dũng",age:30,gender:"m",hair:"#302925",skin:"#edbd96",shirt:"#6d8b70",style:"short",mood:"“Một cà phê phin đen nha.”"},
+ {name:"Cô Vân",age:36,gender:"f",hair:"#352927",skin:"#efc5a4",shirt:"#bb8b64",style:"long",glasses:true,mood:"“Cho cô soda chanh mát lạnh.”"},
+ {name:"Chú Phúc",age:53,gender:"m",hair:"#5d514b",skin:"#e2b28e",shirt:"#8d7967",style:"side",mustache:true,mood:"“Như mọi khi, cà phê đậm nhé!”"}
+];
+function customerSvg(c){
+ const hairTop=c.style==="cap"?`<path d="M24 39 Q25 12 50 12 Q75 12 76 39 L70 35 Q52 26 31 37Z" fill="${c.hair}"/><path d="M24 35 Q50 29 76 35 L73 43 Q50 38 27 44Z" fill="#465f70"/>`:`<path d="M23 46 Q18 13 50 13 Q81 13 77 47 L72 69 Q68 42 50 40 Q31 40 28 69Z" fill="${c.hair}"/>`;
+ const hairExtra=c.style==="bun"?`<circle cx="73" cy="35" r="13" fill="${c.hair}"/><path d="M27 39 Q50 24 70 38" fill="none" stroke="${c.hair}" stroke-width="8"/>`:c.style==="long"?`<path d="M24 42 Q18 64 29 78 L37 81 L34 48Z M75 42 Q82 64 71 80 L63 81 L66 47Z" fill="${c.hair}"/>`:c.style==="ponytail"?`<path d="M69 33 Q88 35 78 61 L68 53Z" fill="${c.hair}"/>`:c.style==="side"?`<path d="M22 35 Q45 9 77 31 L73 42 Q48 27 28 44Z" fill="${c.hair}"/>`:``;
+ const glasses=c.glasses?`<g fill="none" stroke="#4a3931" stroke-width="2.6"><rect x="31" y="43" width="14" height="11" rx="4"/><rect x="55" y="43" width="14" height="11" rx="4"/><path d="M45 47 L55 47"/></g>`:"";
+ const moustache=c.mustache?`<path d="M38 58 Q43 53 50 58 Q57 53 63 58 Q58 65 50 61 Q43 65 38 58Z" fill="#514039"/>`:"";
+ return `<svg viewBox="0 0 100 120" role="img" aria-label="${c.name}, ${c.age} tuổi, nhân vật chibi Việt Nam"><ellipse cx="50" cy="112" rx="27" ry="5" fill="#75583d" opacity=".25"/><path d="M19 113 L24 82 Q28 69 50 69 Q72 69 76 82 L81 113Z" fill="${c.shirt}" stroke="#4c463b" stroke-width="2"/><path d="M42 71 L50 83 L58 71" fill="#f4e6d0"/><path d="M40 66 L40 76 Q50 84 60 76 L60 66" fill="${c.skin}"/><ellipse cx="50" cy="45" rx="27" ry="31" fill="${c.skin}" stroke="#6e5140" stroke-width="1.5"/><ellipse cx="22" cy="48" rx="5" ry="8" fill="${c.skin}"/><ellipse cx="78" cy="48" rx="5" ry="8" fill="${c.skin}"/>${hairTop}${hairExtra}<ellipse cx="40" cy="48" rx="3.5" ry="5" fill="#382d29"/><ellipse cx="60" cy="48" rx="3.5" ry="5" fill="#382d29"/><circle cx="41" cy="46" r="1.3" fill="white"/><circle cx="61" cy="46" r="1.3" fill="white"/>${glasses}<path d="M45 63 Q50 67 56 62" fill="none" stroke="#a45d59" stroke-width="2.5" stroke-linecap="round"/>${moustache}<path d="M27 39 Q30 18 50 17 Q70 17 74 39" fill="none" stroke="${c.hair}" stroke-width="7" stroke-linecap="round"/><circle cx="30" cy="57" r="3" fill="#e99a8b" opacity=".65"/><circle cx="70" cy="57" r="3" fill="#e99a8b" opacity=".65"/><path d="M35 90 L40 103 M65 90 L60 103" stroke="#e8d7bc" stroke-width="2" opacity=".8"/></svg>`;
+}
+let customerIndex=Math.floor(Math.random()*customers.length);
+for(const ingredient of Object.keys(costs)) {
+ if(!(ingredient in state.inventory)) state.inventory[ingredient] = initial.inventory[ingredient] ?? 0;
+}
+function loadState(){try{return Object.assign({},initial,JSON.parse(localStorage.getItem("caphepho-save")||"{}"))}catch(e){return structuredClone(initial)}}
+function save(){localStorage.setItem("caphepho-save",JSON.stringify(state))}
+function money(n){return Math.round(n).toLocaleString("vi-VN")+"đ"}
+function setStatus(t){document.getElementById("status").textContent=t}
+function newOrder(){const names=Object.keys(drinks).filter(name=>drinks[name].unlock<=state.level);state.order=names[Math.floor(Math.random()*names.length)]}
+function render(){
+ if(!drinks[state.order] || drinks[state.order].unlock>state.level) state.order="Cà phê sữa đá";
+ renderMenu();
+ document.getElementById("money").textContent=money(state.money);
+ document.getElementById("level").textContent="Cấp "+state.level;
+ document.getElementById("served").textContent=state.served;
+ const d=drinks[state.order]||drinks["Cà phê sữa đá"];
+ document.getElementById("orderName").textContent="☕ "+state.order;
+ const customer=customers[customerIndex%customers.length];
+ document.getElementById("customerAvatar").innerHTML=customerSvg(customer);
+ document.getElementById("customerAvatar").setAttribute("aria-label",customer.name+", "+customer.age+" tuổi");
+ document.getElementById("customerName").textContent=customer.name;
+ document.getElementById("customerAge").textContent=customer.age+" tuổi · Khách Việt Nam";
+ document.getElementById("customerMood").textContent=customer.mood;
+ document.getElementById("prepProgress").style.width=(prepStep/3*100)+"%";
+ document.getElementById("prepHint").textContent=prepStep===0?"Bắt đầu bằng việc chuẩn bị nguyên liệu và dụng cụ.":prepStep===1?"Tốt lắm! Tiếp tục pha đúng công thức của khách.":prepStep===2?"Gần xong rồi! Hoàn thiện ly nước trước khi giao.":"Món đã sẵn sàng. Bấm giao món để nhận tiền nhé!";
+ [1,2,3].forEach(n=>{const b=document.getElementById("prep"+n);b.classList.toggle("done",prepStep>=n);b.classList.toggle("active",prepStep===n-1);});
+ document.getElementById("serveBtn").disabled=prepStep<3;
+ document.getElementById("serveBtn").textContent=prepStep<3?"🔒 Hoàn thành "+(3-prepStep)+" bước nữa":"🛎️ GIAO MÓN CHO KHÁCH";
+ document.getElementById("orderDesc").textContent=d.desc;
+ document.getElementById("recipe").textContent="Giá bán: "+money(d.price+(state.level-1)*2000)+" · Công thức: "+Object.entries(d.recipe).map(([k,v])=>k+" × "+v).join(", ");
+ document.getElementById("inventory").innerHTML=Object.entries(state.inventory).map(([k,v])=>`<div class="ingredient"><span>${k}</span><strong class="${v<=2?'low':''}">${v}</strong></div>`).join("");
+ document.getElementById("upgradeBtn").textContent="⬆ Nâng cấp · "+money(80000*state.level);
+}
+function choose(name){state.order=name;prepStep=0;setStatus("Khách đã gọi "+name+". Bắt đầu pha chế nhé!");save();render()}
+function doPrep(step){if(step!==prepStep+1){setStatus(step<=prepStep?"Bước này mày đã làm rồi!":"Làm lần lượt từ bước 1 nhé.");return}prepStep=step;render();setStatus(["","Đã chuẩn bị nguyên liệu và dụng cụ!","Đang có mùi cà phê thơm rồi!","Ly nước đã hoàn thiện, giao cho khách thôi!"][step]);}
+function serve(){
+ const d=drinks[state.order];
+ for(const [item,qty] of Object.entries(d.recipe)){if((state.inventory[item]||0)<qty){setStatus("Thiếu "+item+"! Hãy nhập thêm nguyên liệu.");return}}
+ for(const [item,qty] of Object.entries(d.recipe))state.inventory[item]-=qty;
+ const reward=d.price+(state.level-1)*2000;state.money+=reward;state.served++;newOrder();prepStep=0;customerIndex++;save();render();setStatus("Giao món thành công! Bạn nhận "+money(reward)+". Một khách mới vừa bước vào quán!");
+}
+function restock(){
+ const needed=new Set();
+ for(const d of Object.values(drinks)){if(d.unlock<=state.level)for(const ingredient of Object.keys(d.recipe))needed.add(ingredient)}
+ const list=[...needed].filter(k=>costs[k]!==undefined);
+ const cost=list.reduce((sum,k)=>sum+costs[k],0)*3;
+ if(state.money<cost){setStatus("Chưa đủ tiền nhập kho. Cần "+money(cost)+".");return}
+ state.money-=cost;
+ for(const k of list)state.inventory[k]=(state.inventory[k]||0)+3;
+ save();render();setStatus("Đã nhập thêm 3 đơn vị cho nguyên liệu của các món đã mở khóa. Chi phí "+money(cost)+".")
+}
+function upgrade(){
+ const oldLevel=state.level;
+ const cost=80000*state.level;
+ if(state.money<cost){setStatus("Chưa đủ tiền nâng cấp. Cần "+money(cost)+".");return}
+ state.money-=cost;state.level++;
+ const unlocked=Object.entries(drinks).filter(([name,d])=>d.unlock>oldLevel && d.unlock<=state.level).map(([name])=>name);
+ save();render();
+ setStatus(unlocked.length
+  ? "Lên Level "+state.level+"! Đã mở khóa: "+unlocked.join(", ")+"."
+  : "Nâng cấp thành công lên Level "+state.level+"! Mỗi đơn hàng được cộng thêm tiền thưởng.");
+}
+function start(){document.getElementById("menu").classList.add("hidden");document.getElementById("game").classList.remove("hidden");render()}
+function home(){document.getElementById("game").classList.add("hidden");document.getElementById("menu").classList.remove("hidden");document.getElementById("modal").classList.add("hidden");paused=false}
+function reset(){if(confirm("Xóa tiến trình và chơi lại từ đầu?")){state=structuredClone(initial);save();render();setStatus("Đã bắt đầu lại từ đầu.")}}
+document.getElementById("startBtn").onclick=start;
+document.getElementById("resetMenuBtn").onclick=reset;
+document.getElementById("homeBtn").onclick=home;
+document.getElementById("pauseBtn").onclick=()=>{paused=true;document.getElementById("modalTitle").textContent="Tạm dừng";document.getElementById("modalText").textContent="Tiến trình đã được lưu trên thiết bị.";document.getElementById("modal").classList.remove("hidden")};
+document.getElementById("resumeBtn").onclick=()=>document.getElementById("modal").classList.add("hidden");
+document.getElementById("modalHomeBtn").onclick=home;
+document.getElementById("serveBtn").onclick=serve;
+document.getElementById("prep1").onclick=()=>doPrep(1);
+document.getElementById("prep2").onclick=()=>doPrep(2);
+document.getElementById("prep3").onclick=()=>doPrep(3);
+document.getElementById("restockBtn").onclick=restock;
+document.getElementById("upgradeBtn").onclick=upgrade;
+function renderMenu(){
+ document.getElementById("menuGrid").innerHTML=Object.entries(drinks).map(([name,d])=>{
+  const locked=state.level<d.unlock;
+  const label=locked?`🔒 Mở khóa ở Level ${d.unlock}`:`${money(d.price)} · Chọn món`;
+  return `<button class="drink" data-name="${name}" ${locked?"disabled":""}>${locked?"🔒 ":""}${name}<span>${label}</span></button>`;
+ }).join("");
+ document.querySelectorAll(".drink:not(:disabled)").forEach(b=>b.addEventListener("click",()=>choose(b.dataset.name)));
+}
+renderMenu();
+render();
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script>
+</body>
+</html>

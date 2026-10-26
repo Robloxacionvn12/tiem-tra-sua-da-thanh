@@ -1,0 +1,10 @@
+{
+  "name": "Cà Phê Phố",
+  "short_name": "Cà Phê Phố",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#171b1d",
+  "theme_color": "#171b1d",
+  "description": "Game quản lý tiệm cà phê Việt Nam",
+  "icons": []
+}
